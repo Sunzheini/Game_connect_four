@@ -45,8 +45,41 @@ def move_placement(c):
     return False
 
 
-def win_condition():
-    pass
+def win_condition(player, cel_column):
+    cell_r = 0
+    cell_c = cel_column - 1
+    for row in range(len(matrix)):
+        if matrix[row][cell_c] == player:
+            cell_r = row
+            break
+
+    def is_win_condition_in_direction(row, column, direction):
+        row_delta, column_delta = direction
+        rows_boundary = min(len(matrix), row + 4 * row_delta)
+        columns_boundary = min(len(matrix[0]), column + 4 * column_delta)
+
+        counter = 0
+        is_row_included = rows_boundary == row
+        is_column_included = columns_boundary == column
+
+        while (row < rows_boundary or is_row_included) \
+                and (column < columns_boundary or is_column_included) \
+                and player == matrix[row][column]:
+            counter += 1
+            row += row_delta
+            column += column_delta
+
+        return counter == 4
+
+    horizontal_deltas = (0, 1)
+    vertical_deltas = (1, 0)
+    main_diagonal_deltas = (1, 1)
+    secondary_diagonal_deltas = (-1, 1)
+
+    return is_win_condition_in_direction(cell_r, cell_c, horizontal_deltas) \
+           or is_win_condition_in_direction(cell_r, cell_c, vertical_deltas) \
+           or is_win_condition_in_direction(cell_r, cell_c, main_diagonal_deltas) \
+           or is_win_condition_in_direction(cell_r, cell_c, secondary_diagonal_deltas)
 
 
 # Execution
@@ -88,8 +121,8 @@ while 1:
 
     print_matrix(matrix)
 
-    if win_condition():
-        print(f"The winner is player {current_player}")
+    if win_condition(current_player, selected_column):
+        print("Won")
         break
 
     current_player = rotate_player_order(current_player)
